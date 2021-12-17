@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import cors from 'cors';
 import _ from 'lodash'; /*необходимая для merge библиотека*/
 import fs from 'fs';
-import moment from 'moment';
+import momentZone from 'moment-timezone';
 
 
 const app = express();
@@ -39,9 +39,8 @@ const cordHibin = {
   lon: 33.687525,
 };
 
-const now = moment.utc();
 
-const osinovaiRosFirsPointOpenweter = "https://api.openweathermap.org/data/2.5/weather?lat=67.670036&lon=33.687525&lang=fr&appid=c48b10ff7d42501ae1d7246b3fbed3e1";
+const osinovaiRosFirsPointOpenweter = "https://api.openweathermap.org/data/2.5/weather?lat=67.670036&lon=33.687525&lang=fr&units=metric&appid=c48b10ff7d42501ae1d7246b3fbed3e1";
 
 
 app.use(express.json());
@@ -50,13 +49,14 @@ function fetchDataOpenweathermap(link){
   fetch(link)
     .then(res => res.json())
     .then(json => {
+        let currentTime = momentZone().tz("Europe/Moscow").format();
         console.log(json);
 
         const query = `
           INSERT INTO in_openweatherdata (temperature, windspeed, winddegree, windgust, pressure, humidity, lon, lat, time)
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning *
         `;
-        client.query(query, [json.main.temp, json.wind.speed, json.wind.deg, json.wind.gust, json.main.pressure, json.main.humidity, cordHibin.lon, cordHibin.lat, now], (err, res) => {
+        client.query(query, [json.main.temp, json.wind.speed, json.wind.deg, json.wind.gust, json.main.pressure, json.main.humidity, cordHibin.lon, cordHibin.lat, currentTime], (err, res) => {
           if (err) {
             console.error(err);
             return;
