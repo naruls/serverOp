@@ -76,7 +76,7 @@ function endFuction(linkOpen) {
 }
 
 
-let timerId = setInterval(() => endFuction(osinovaiRosFirsPointOpenweter), 6000);
+let timerId = setInterval(() => endFuction(osinovaiRosFirsPointOpenweter), 600000);
 
 
 app.listen(PORT, () => {
